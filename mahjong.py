@@ -2,7 +2,6 @@ import random
 import time
 from collections import Counter
 
-# Define the tile sets with clearer identifiers
 wind = ['wind east', 'wind south', 'wind west', 'wind north', 'wind red', 'wind green']
 bing = ['bing ' + str(i) for i in range(1, 10)]
 tiao = ['tiao ' + str(i) for i in range(1, 10)]
@@ -11,7 +10,6 @@ wan = ['wan ' + str(i) for i in range(1, 10)]
 # Combine all the tiles into a full deck (4 of each tile)
 all_tiles = 4 * (wind + bing + tiao + wan)
 
-# Function to sort tiles
 def sort_tiles(tiles):
     wind_tiles = [tile for tile in tiles if 'wind' in tile]
     tiao_tiles = sorted([tile for tile in tiles if 'tiao' in tile], key=lambda x: int(x.split()[1]))
@@ -19,17 +17,14 @@ def sort_tiles(tiles):
     bing_tiles = sorted([tile for tile in tiles if 'bing' in tile], key=lambda x: int(x.split()[1]))
     return wind_tiles + tiao_tiles + wan_tiles + bing_tiles
 
-# Function to draw a tile from the deck
 def draw_tile(deck):
     return deck.pop(random.randint(0, len(deck) - 1))
 
-# Initialize the game by dealing 14 tiles to the player and 13 to others
 def initialize_game(deck):
     player_tiles = [draw_tile(deck) for _ in range(14)]
     other_players_tiles = [[draw_tile(deck) for _ in range(13)] for _ in range(3)]
     return sort_tiles(player_tiles), other_players_tiles
 
-# Display the player's tiles and completed sets
 def display_tiles(player_tiles, completed_sets, penged_sets):
     print("\nYour tiles:", " | ".join(sort_tiles(player_tiles)))
     if completed_sets:
@@ -37,7 +32,6 @@ def display_tiles(player_tiles, completed_sets, penged_sets):
     if penged_sets:
         print("Penged sets:", " | ".join(" | ".join(set_group) for set_group in penged_sets))
 
-# Let the player discard a tile
 def discard_tile(player_tiles):
     display_tiles(player_tiles, completed_sets=[], penged_sets=[])
     discard = input("Which tile would you like to discard? Type the exact name: ")
@@ -62,7 +56,7 @@ def can_chi(player_tiles, discard_tile):
         (f"{suit} {tile_number - 1}" in player_tiles and f"{suit} {tile_number + 1}" in player_tiles)
     )
 
-# Function to find all valid tiles needed for Chi
+
 def find_chi_options(player_tiles, discard_tile):
     if discard_tile.startswith("wind"):
         return []  # No Chi options for wind tiles
@@ -77,17 +71,14 @@ def find_chi_options(player_tiles, discard_tile):
 
     return options
 
-# After a Chi is made, remove the used tiles from the player's hand
+
 def process_chi(player_tiles, discard_tile, chi_tiles, completed_sets):
-    # Add the new completed set
     completed_sets.append([discard_tile] + list(chi_tiles))
     
-    # Remove the tiles used for the Chi from the player's hand
     player_tiles.remove(discard_tile)
     for tile in chi_tiles:
         player_tiles.remove(tile)
 
-# Check for winning conditions
 def check_win(player_tiles):
     tile_counter = Counter(player_tiles)
     
@@ -110,16 +101,15 @@ def check_win(player_tiles):
     
     return False
 
-# Ask if the player wants to chi or peng
 def ask_for_peng_or_chi(player_tiles, discard_tile, completed_sets, penged_sets, current_player_index):
     if can_peng(player_tiles, discard_tile):
         action = input(f"Would you like to Peng {discard_tile}? (y/n): ")
         if action.lower() == 'y':
             player_tiles.append(discard_tile)
-            penged_sets.append([discard_tile] * 3)  # Three tiles for the Peng set
+            penged_sets.append([discard_tile] * 3) 
             return 'peng'
     
-    if current_player_index == 4:  # Chi only from Player 4
+    if current_player_index == 4: 
         chi_options = find_chi_options(player_tiles, discard_tile)
         if chi_options:
             display_tiles(player_tiles, completed_sets, [])
@@ -141,27 +131,24 @@ def main():
     random.shuffle(deck)
     player_tiles, other_players_tiles = initialize_game(deck)
 
-    completed_sets = []  # Store Chi sets here
-    penged_sets = []     # Store Peng sets here
+    completed_sets = []  # Store Chi sets 
+    penged_sets = []     # Store Peng sets
 
     print("\nLet's test out your mahjong abilities!")
     input("Press Enter to continue...")
 
     print("\nYou have been dealt 14 tiles.")
-    discard = discard_tile(player_tiles)  # First discard without drawing
+    discard = discard_tile(player_tiles)
     discard_pile = [discard]
     print(f"\nYou discarded {discard}. Now you have 13 tiles.")
 
-    current_player_index = 1  # Start with Player 1
+    current_player_index = 1 
 
     while True:
-        # Delay between turns for better pacing
         time.sleep(2)
 
-        if current_player_index == 1:  # Player 1 turn (you)
-            display_tiles(player_tiles, completed_sets, penged_sets)  # Show tiles before your turn
-            
-            # Drawing a tile
+        if current_player_index == 1: 
+            display_tiles(player_tiles, completed_sets, penged_sets)
             new_tile = draw_tile(deck)
             print(f"\nYou drew: {new_tile}")
             keep_tile = input(f"Would you like to keep {new_tile}? (y/n): ")
@@ -173,8 +160,8 @@ def main():
             else:
                 print(f"\nYou did not keep {new_tile}.")
         
-        else:  # Other players' turns (not showing drawn tiles)
-            discard = draw_tile(deck)  # Simulating a discard from other players
+        else: 
+            discard = draw_tile(deck)
             print(f"\nPlayer {current_player_index} discarded: {discard}")
             discard_pile.append(discard)
 
@@ -184,25 +171,24 @@ def main():
                     if action[0] == 'peng':
                         print(f"\nYou penged {discard}.")
                         player_tiles.append(discard)
-                        penged_sets.append([discard] * 3)  # Three tiles for the Peng set
+                        penged_sets.append([discard] * 3)  
                         discard = discard_tile(player_tiles)
                         discard_pile.append(discard)
                         print(f"\nYou discarded {discard}.")
-                        # Remove the completed set from player's tiles
+                        
                         for tile in penged_sets[-1]:
                             player_tiles.remove(tile)
-                        current_player_index = 2  # Player 2 goes next
+                        current_player_index = 2 
 
                     elif action[0] == 'chi':
                         chi_tiles = action[1]
                         print(f"\nYou chi-ed {discard}.")
-                        process_chi(player_tiles, discard, chi_tiles, completed_sets)  # Process the Chi
+                        process_chi(player_tiles, discard, chi_tiles, completed_sets)
                         discard = discard_tile(player_tiles)
                         discard_pile.append(discard)
                         print(f"\nYou discarded {discard}.")
-                        current_player_index = 2  # Player 2 goes next
+                        current_player_index = 2  
 
-        # Display discard pile
         print("\nCurrent discard pile:", " | ".join(discard_pile))
 
         # Check win condition after every discard

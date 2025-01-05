@@ -131,8 +131,8 @@ def main():
     random.shuffle(deck)
     player_tiles, other_players_tiles = initialize_game(deck)
 
-    completed_sets = []  # Store Chi sets 
-    penged_sets = []     # Store Peng sets
+    completed_sets = []  
+    penged_sets = []    
 
     print("\nLet's test out your mahjong abilities!")
     input("Press Enter to continue...")
@@ -195,8 +195,7 @@ def main():
         if check_win(player_tiles):
             break
 
-        current_player_index = (current_player_index + 1) % 4  # Move to the next player (0, 1, 2, 3 corresponds to Player 1, Player 2, Player 3, Player 4)
-
-# Run the game
+        current_player_index = (current_player_index + 1) % 4 
+        
 if __name__ == "__main__":
     main()

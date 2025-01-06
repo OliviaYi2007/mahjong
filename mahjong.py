@@ -56,32 +56,29 @@ def can_chi(player_tiles, discard_tile):
         (f"{suit} {tile_number - 1}" in player_tiles and f"{suit} {tile_number + 1}" in player_tiles)
     )
 
-
 def find_chi_options(player_tiles, discard_tile):
     if discard_tile.startswith("wind"):
-        return []  # No Chi options for wind tiles
+        return [] 
 
     tile_number = int(discard_tile.split()[1])
     suit = discard_tile.split()[0]
     options = []
 
-    # Check for valid tile combinations for Chi
     if f"{suit} {tile_number - 1}" in player_tiles and f"{suit} {tile_number + 1}" in player_tiles:
         options.append((f"{suit} {tile_number - 1}", f"{suit} {tile_number + 1}"))
 
     return options
 
-
 def process_chi(player_tiles, discard_tile, chi_tiles, completed_sets):
     completed_sets.append([discard_tile] + list(chi_tiles))
-    
+
     player_tiles.remove(discard_tile)
     for tile in chi_tiles:
         player_tiles.remove(tile)
 
 def check_win(player_tiles):
     tile_counter = Counter(player_tiles)
-    
+
     pairs = 0
     sets_of_three = 0
 
@@ -89,7 +86,7 @@ def check_win(player_tiles):
         if count >= 3:
             sets_of_three += count // 3
         if count >= 2:
-            pairs += 1  # Count pairs for the final pair condition
+            pairs += 1 
 
     # Check for 4 sets of three and 1 pair or 7 pairs
     if sets_of_three >= 4 and pairs >= 1:
@@ -98,7 +95,7 @@ def check_win(player_tiles):
     elif sum(count // 2 for count in tile_counter.values()) >= 7:
         print("\nCongratulations! You won with 7 pairs!")
         return True
-    
+
     return False
 
 def ask_for_peng_or_chi(player_tiles, discard_tile, completed_sets, penged_sets, current_player_index):
@@ -108,7 +105,7 @@ def ask_for_peng_or_chi(player_tiles, discard_tile, completed_sets, penged_sets,
             player_tiles.append(discard_tile)
             penged_sets.append([discard_tile] * 3) 
             return 'peng'
-    
+
     if current_player_index == 4: 
         chi_options = find_chi_options(player_tiles, discard_tile)
         if chi_options:
@@ -125,14 +122,43 @@ def ask_for_peng_or_chi(player_tiles, discard_tile, completed_sets, penged_sets,
 
     return None
 
-# Main game loop
+def ask_for_peng_or_chi(player_tiles, discard_tile, completed_sets, penged_sets, current_player_index):
+    if can_peng(player_tiles, discard_tile):
+        action = input(f"Would you like to Peng {discard_tile}? (y/n): ")
+        if action.lower() == 'y':
+            penged_sets.append([discard_tile] * 3)
+            player_tiles = [tile for tile in player_tiles if tile != discard_tile][:11]
+            print(f"\nYou penged {discard_tile}.")
+            return 'peng'
+
+    if current_player_index == 4:  # Chi is only allowed if Player 4 discards a card
+        chi_options = find_chi_options(player_tiles, discard_tile)
+        if chi_options:
+            display_tiles(player_tiles, completed_sets, [])
+            print(f"\nYou can Chi {discard_tile}. Choose tiles to form the set:")
+            for i, option in enumerate(chi_options):
+                print(f"Option {i + 1}: {', '.join(option)}")
+            option_choice = int(input("Choose the option number: ")) - 1
+            if 0 <= option_choice < len(chi_options):
+                selected_tiles = chi_options[option_choice]
+                action = input(f"Would you like to Chi {discard_tile} with {', '.join(selected_tiles)}? (y/n): ")
+                if action.lower() == 'y':
+                    completed_sets.append([discard_tile] + list(selected_tiles))
+                    player_tiles = [tile for tile in player_tiles if tile not in selected_tiles][:11]
+                    print(f"\nYou chi-ed {discard_tile}.")
+                    return 'chi'
+
+    return None
+
+# Main game 
+
 def main():
     deck = all_tiles.copy()
     random.shuffle(deck)
     player_tiles, other_players_tiles = initialize_game(deck)
 
-    completed_sets = []  
-    penged_sets = []    
+    completed_sets = []  # Sets formed by Chi
+    penged_sets = []     # Sets formed by Peng
 
     print("\nLet's test out your mahjong abilities!")
     input("Press Enter to continue...")
@@ -142,12 +168,12 @@ def main():
     discard_pile = [discard]
     print(f"\nYou discarded {discard}. Now you have 13 tiles.")
 
-    current_player_index = 1 
+    current_player_index = 1  # Start with Player 2
 
     while True:
         time.sleep(2)
 
-        if current_player_index == 1: 
+        if current_player_index == 1:  # User's turn
             display_tiles(player_tiles, completed_sets, penged_sets)
             new_tile = draw_tile(deck)
             print(f"\nYou drew: {new_tile}")
@@ -159,8 +185,8 @@ def main():
                 print(f"\nYou discarded {discard}.")
             else:
                 print(f"\nYou did not keep {new_tile}.")
-        
-        else: 
+
+        else:  # Other players' turns
             discard = draw_tile(deck)
             print(f"\nPlayer {current_player_index} discarded: {discard}")
             discard_pile.append(discard)
@@ -168,26 +194,16 @@ def main():
             if current_player_index == 4 or can_peng(player_tiles, discard):
                 action = ask_for_peng_or_chi(player_tiles, discard, completed_sets, penged_sets, current_player_index)
                 if action:
-                    if action[0] == 'peng':
-                        print(f"\nYou penged {discard}.")
-                        player_tiles.append(discard)
-                        penged_sets.append([discard] * 3)  
+                    if action == 'peng':
                         discard = discard_tile(player_tiles)
                         discard_pile.append(discard)
                         print(f"\nYou discarded {discard}.")
-                        
-                        for tile in penged_sets[-1]:
-                            player_tiles.remove(tile)
-                        current_player_index = 2 
-
-                    elif action[0] == 'chi':
-                        chi_tiles = action[1]
-                        print(f"\nYou chi-ed {discard}.")
-                        process_chi(player_tiles, discard, chi_tiles, completed_sets)
+                        current_player_index = 2  # Skip next turn
+                    elif action == 'chi':
                         discard = discard_tile(player_tiles)
                         discard_pile.append(discard)
                         print(f"\nYou discarded {discard}.")
-                        current_player_index = 2  
+                        current_player_index = 2  # Skip next turn
 
         print("\nCurrent discard pile:", " | ".join(discard_pile))
 
@@ -195,7 +211,7 @@ def main():
         if check_win(player_tiles):
             break
 
-        current_player_index = (current_player_index + 1) % 4 
-        
+        current_player_index = (current_player_index + 1) % 4  # Rotate turns
+
 if __name__ == "__main__":
     main()

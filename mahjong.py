@@ -7,7 +7,6 @@ bing = ['bing ' + str(i) for i in range(1, 10)]
 tiao = ['tiao ' + str(i) for i in range(1, 10)]
 wan = ['wan ' + str(i) for i in range(1, 10)]
 
-# Combine all the tiles into a full deck (4 of each tile)
 all_tiles = 4 * (wind + bing + tiao + wan)
 
 def sort_tiles(tiles):
@@ -131,7 +130,7 @@ def ask_for_peng_or_chi(player_tiles, discard_tile, completed_sets, penged_sets,
             print(f"\nYou penged {discard_tile}.")
             return 'peng'
 
-    if current_player_index == 4:  # Chi is only allowed if Player 4 discards a card
+    if current_player_index == 4:
         chi_options = find_chi_options(player_tiles, discard_tile)
         if chi_options:
             display_tiles(player_tiles, completed_sets, [])
@@ -168,12 +167,12 @@ def main():
     discard_pile = [discard]
     print(f"\nYou discarded {discard}. Now you have 13 tiles.")
 
-    current_player_index = 1  # Start with Player 2
+    current_player_index = 1  
 
     while True:
         time.sleep(2)
 
-        if current_player_index == 1:  # User's turn
+        if current_player_index == 1: 
             display_tiles(player_tiles, completed_sets, penged_sets)
             new_tile = draw_tile(deck)
             print(f"\nYou drew: {new_tile}")
@@ -186,7 +185,7 @@ def main():
             else:
                 print(f"\nYou did not keep {new_tile}.")
 
-        else:  # Other players' turns
+        else: 
             discard = draw_tile(deck)
             print(f"\nPlayer {current_player_index} discarded: {discard}")
             discard_pile.append(discard)
@@ -198,12 +197,12 @@ def main():
                         discard = discard_tile(player_tiles)
                         discard_pile.append(discard)
                         print(f"\nYou discarded {discard}.")
-                        current_player_index = 2  # Skip next turn
+                        current_player_index = 2 
                     elif action == 'chi':
                         discard = discard_tile(player_tiles)
                         discard_pile.append(discard)
                         print(f"\nYou discarded {discard}.")
-                        current_player_index = 2  # Skip next turn
+                        current_player_index = 2  
 
         print("\nCurrent discard pile:", " | ".join(discard_pile))
 

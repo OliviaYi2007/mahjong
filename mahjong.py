@@ -41,11 +41,9 @@ def discard_tile(player_tiles):
         return discard_tile(player_tiles)
     return discard
 
-# Check if the player can peng
 def can_peng(player_tiles, discard_tile):
     return player_tiles.count(discard_tile) == 2
 
-# Check if the player can chi
 def can_chi(player_tiles, discard_tile):
     if discard_tile.startswith("wind"):
         return False
@@ -87,7 +85,7 @@ def check_win(player_tiles):
         if count >= 2:
             pairs += 1 
 
-    # Check for 4 sets of three and 1 pair or 7 pairs
+
     if sets_of_three >= 4 and pairs >= 1:
         print("\nCongratulations! You won with 4 sets of three and 1 pair!")
         return True
@@ -149,15 +147,15 @@ def ask_for_peng_or_chi(player_tiles, discard_tile, completed_sets, penged_sets,
 
     return None
 
-# Main game 
+
 
 def main():
     deck = all_tiles.copy()
     random.shuffle(deck)
     player_tiles, other_players_tiles = initialize_game(deck)
 
-    completed_sets = []  # Sets formed by Chi
-    penged_sets = []     # Sets formed by Peng
+    completed_sets = [] 
+    penged_sets = []  
 
     print("\nLet's test out your mahjong abilities!")
     input("Press Enter to continue...")
@@ -208,7 +206,7 @@ def main():
         if check_win(player_tiles):
             break
 
-        current_player_index = (current_player_index + 1) % 4  # Rotate turns
+        current_player_index = (current_player_index + 1) % 4
 
 if __name__ == "__main__":
     main()

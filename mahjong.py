@@ -205,8 +205,6 @@ def main():
                         current_player_index = 2  
 
         print("\nCurrent discard pile:", " | ".join(discard_pile))
-
-        # Check win condition after every discard
         if check_win(player_tiles):
             break
 
